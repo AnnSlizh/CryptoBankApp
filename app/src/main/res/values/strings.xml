@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">CryptoBankApp</string>
+
+    //Coin Detail Screen
+    <string name="transaction">Transaction</string>
+    <string name="current_price">Current price</string>
+    <string name="average_purchase_price">Average purchase price</string>
+    <string name="replenishment">Replenishment</string>
+    <string name="return_to_home_screen">Return to home screen</string>
+
+    //Add Transaction Screen
+    <string name="add_transaction">Add transaction</string>
+    <string name="add_coin_transaction">Add %1$s transaction</string>
+    <string name="cansel">Cansel</string>
+    <string name="price_coin">Price coin</string>Add
+    <string name="add">Add</string>
+    <string name="price">Price</string>
+    <string name="set_price">Set price</string>
 </resources>
