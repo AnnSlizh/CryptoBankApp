@@ -11,9 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import by.slizh.cryptobankapp.presentation.components.bars.BottomNavigationBar
-import by.slizh.cryptobankapp.presentation.components.bars.currentRoute
 import by.slizh.cryptobankapp.presentation.navigation.Screen
 import by.slizh.cryptobankapp.presentation.screens.AddTransactionNextStepScreen
 import by.slizh.cryptobankapp.presentation.screens.AddTransactionScreen
@@ -29,11 +29,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             CryptoBankAppTheme {
                 val navController = rememberNavController()
+                val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Color.White,
                     bottomBar = {
-                        when (currentRoute(navController)) {
+                        when (currentRoute) {
                             Screen.HomeScreen.route -> BottomNavigationBar(navController = navController)
                             Screen.CoinDetailScreen.route -> BottomNavigationBar(navController = navController)
                             Screen.SettingsScreen.route -> BottomNavigationBar(navController = navController)
