@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">CryptoBankApp</string>
 
+    //Home Screen
+    <string name="null_transaction">Null transaction</string>
+    <string name="all_time"> All time</string>
+
     //Coin Detail Screen
     <string name="transaction">Transaction</string>
     <string name="current_price">Current price</string>
@@ -21,4 +25,10 @@
     <string name="home">Home</string>
     <string name="settings">Settings</string>
     <string name="navigation_error">Screen not supported in BottomNavigationBar</string>
+
+    //Settings Screen
+    <string name="currency">Currency</string>
+    <string name="theme">Theme</string>
+    <string name="USD">USD</string>
+    <string name="light">Light</string>
 </resources>

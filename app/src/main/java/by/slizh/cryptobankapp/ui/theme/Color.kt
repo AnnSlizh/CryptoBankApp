@@ -17,5 +17,7 @@ val Green = Color(0xFF71D65D)
 val BlueDefault = Color(0xFF1C73F0)
 val GrayClick= Color(0xFFEBEBEB)
 val BlueClick = Color(0xFF085EDA)
+val Red = Color(0xFFF01C1C)
+
 
 
