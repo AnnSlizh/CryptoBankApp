@@ -32,16 +32,19 @@ class AddTransactionViewModel @Inject constructor(
                         constPrice = selectedCoin?.constPrice ?: "0.0"
                     )
                 }
+                validateForm()
             }
 
             is AddTransactionEvent.EnterAmount -> {
                 val amount = event.value.replace(',', '.')
                 _state.update { it.copy(amount = amount) }
+                validateForm()
             }
 
             is AddTransactionEvent.EnterPrice -> {
                 val price = event.value.replace(',', '.')
                 _state.update { it.copy(priceCoin = price) }
+                validateForm()
             }
 
             is AddTransactionEvent.ValidateFields -> {
@@ -55,34 +58,38 @@ class AddTransactionViewModel @Inject constructor(
                         priceFormatError = !isPriceValid
                     )
                 }
+                validateForm()
             }
 
             is AddTransactionEvent.AddTransaction -> {
-                val isAmountValid = _state.value.amount.toDoubleOrNull() != null
-                val isPriceValid = _state.value.priceCoin.toDoubleOrNull() != null
+                if (!_state.value.isButtonEnabled) return
 
-                if (_state.value.coinName.isNotBlank() &&
-                    _state.value.amount.isNotBlank() &&
-                    _state.value.priceCoin.isNotBlank() &&
-                    isAmountValid &&
-                    isPriceValid
-                ) {
-                    val transaction = Transaction(
-                        id = 0,
-                        coinName = _state.value.coinName,
-                        amount = _state.value.amount.toDouble(),
-                        priceCoin = _state.value.priceCoin.toDouble(),
-                        date = Date(),
-                        profit = (_state.value.constPrice.toDouble() - _state.value.priceCoin.toDouble()) * _state.value.amount.toDouble()
-                    )
+                val transaction = Transaction(
+                    id = 0,
+                    coinName = _state.value.coinName,
+                    amount = _state.value.amount.toDouble(),
+                    priceCoin = _state.value.priceCoin.toDouble(),
+                    date = Date(),
+                    profit = (_state.value.constPrice.toDouble() - _state.value.priceCoin.toDouble()) * _state.value.amount.toDouble()
+                )
 
-                    viewModelScope.launch {
-                        transactionRepository.addTransaction(transaction)
-                        _state.update { AddTransactionState() }
-                    }
+                viewModelScope.launch {
+                    transactionRepository.addTransaction(transaction)
+                    _state.update { AddTransactionState() }
                 }
             }
         }
     }
-}
 
+    private fun validateForm() {
+        val isAmountValid = _state.value.amount.toDoubleOrNull() != null
+        val isPriceValid = _state.value.priceCoin.toDoubleOrNull() != null
+        val isButtonEnabled = _state.value.coinName.isNotBlank() &&
+                _state.value.amount.isNotBlank() &&
+                _state.value.priceCoin.isNotBlank() &&
+                isAmountValid &&
+                isPriceValid
+
+        _state.update { it.copy(isButtonEnabled = isButtonEnabled) }
+    }
+}

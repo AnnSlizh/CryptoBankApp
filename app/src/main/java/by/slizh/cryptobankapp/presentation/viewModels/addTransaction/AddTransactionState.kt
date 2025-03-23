@@ -8,5 +8,6 @@ data class AddTransactionState(
     val amountError: Boolean = false,
     val priceCoinError: Boolean = false,
     val amountFormatError: Boolean = false,
-    val priceFormatError: Boolean = false
+    val priceFormatError: Boolean = false,
+    val isButtonEnabled: Boolean = false
 )

@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.google.dagger.hilt.android)
 }
 
 android {
@@ -69,4 +71,19 @@ dependencies {
 
     //Navigation
     implementation(libs.navigation.compose)
+
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
+
+    //Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    annotationProcessor(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+
+    //Hilt
+    implementation (libs.hilt.android)
+    implementation (libs.androidx.hilt.navigation.compose)
+    ksp(libs.hilt.android.compiler)
 }
