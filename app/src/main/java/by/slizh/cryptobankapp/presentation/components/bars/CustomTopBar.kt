@@ -20,23 +20,24 @@ import by.slizh.cryptobankapp.R
 import by.slizh.cryptobankapp.ui.theme.Gray
 
 @Composable
-fun CustomTopAppBar(coinName: String) {
+fun CustomTopAppBar(coinName: String, onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        IconButton(modifier = Modifier
-            .width(40.dp)
-            .height(40.dp),
-            onClick = {  }
+        IconButton(
+            modifier = Modifier
+                .width(40.dp)
+                .height(40.dp),
+            onClick = onClick
         ) {
             Image(
                 painter = painterResource(id = R.drawable.back_icon),
                 contentDescription = stringResource(id = R.string.return_to_home_screen)
             )
         }
-        Spacer(modifier = Modifier.width(100.dp))
+        Spacer(modifier = Modifier.width(115.dp))
 
         Text(
             text = coinName,

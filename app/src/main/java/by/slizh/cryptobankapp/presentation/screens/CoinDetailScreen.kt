@@ -11,40 +11,64 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import by.slizh.cryptobankapp.Coin
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import by.slizh.cryptobankapp.R
 import by.slizh.cryptobankapp.presentation.components.bars.CustomTopAppBar
 import by.slizh.cryptobankapp.presentation.components.PriceBox
 import by.slizh.cryptobankapp.presentation.components.cards.ReplenishmentCard
+import by.slizh.cryptobankapp.presentation.viewModels.coinDetail.CoinDetailEvent
+import by.slizh.cryptobankapp.presentation.viewModels.coinDetail.CoinDetailViewModel
 import by.slizh.cryptobankapp.ui.theme.Black
 import by.slizh.cryptobankapp.ui.theme.Gray
 import by.slizh.cryptobankapp.ui.theme.Green
+import by.slizh.cryptobankapp.domain.CoinEnum
+import by.slizh.cryptobankapp.ui.theme.Red
+import by.slizh.cryptobankapp.util.DoubleFormat
 
 @Composable
-fun CoinDetailScreen(modifier: Modifier = Modifier) {
+fun CoinDetailScreen(
+    navController: NavController,
+    coinName: String?,
+    coinDetailViewModel: CoinDetailViewModel = hiltViewModel()
+) {
+    val state by coinDetailViewModel.state.collectAsState()
+    val coinImageResId = CoinEnum.entries.find { it.coinName == coinName }?.photoCoinResId ?: R.drawable.bitcoin
+
+
+    LaunchedEffect(coinName) {
+        if (coinName != null) {
+            coinDetailViewModel.onEvent(CoinDetailEvent.LoadTransactions(coinName))
+        }
+    }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(start = 16.dp, top = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CustomTopAppBar(Coin.BITCOIN.coinName)
+
+        coinName?.let { CustomTopAppBar(coinName = it, onClick = { navController.popBackStack() }) }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Image(
-            painter = painterResource(id = Coin.BITCOIN.photoCoinResId), contentDescription = "",
+            painter = painterResource(id = coinImageResId),
+            contentDescription = "",
             modifier = Modifier
                 .width(80.dp)
                 .height(80.dp)
@@ -52,7 +76,7 @@ fun CoinDetailScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "24 715 \$",
+            text = state.constPrice + " $",
             fontWeight = FontWeight.SemiBold,
             fontSize = 24.sp,
             lineHeight = 24.sp,
@@ -62,25 +86,25 @@ fun CoinDetailScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "+341,14 \$ (+24,1 %)",
+            text = "${state.profitTotal} $ (${state.profitPercentage}%)",
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp,
             lineHeight = 14.sp,
             letterSpacing = 0.sp,
-            color = Green
+            color = if (state.profitTotal.toDouble() >= 0) Green else Red
         )
         Spacer(modifier = Modifier.height(24.dp))
 
         Row(modifier = Modifier.fillMaxWidth()) {
             PriceBox(
                 title = stringResource(id = R.string.average_purchase_price),
-                price = "79 129,13",
+                price = state.averagePurchasePrice,
                 modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.width(8.dp))
             PriceBox(
                 title = stringResource(id = R.string.current_price),
-                price = "97 673,84",
+                price = state.currentPrice,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -102,17 +126,9 @@ fun CoinDetailScreen(modifier: Modifier = Modifier) {
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(3) {
-                ReplenishmentCard(
-                    onClick = { }
-                )
+            items(state.transactions) { transaction ->
+                ReplenishmentCard(transaction)
             }
         }
     }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun CoinDetailScreenPreview() {
-    CoinDetailScreen()
 }

@@ -22,19 +22,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import by.slizh.cryptobankapp.R
+import by.slizh.cryptobankapp.domain.model.Transaction
 import by.slizh.cryptobankapp.ui.theme.Black
 import by.slizh.cryptobankapp.ui.theme.Gray
 import by.slizh.cryptobankapp.ui.theme.Green
 import by.slizh.cryptobankapp.ui.theme.LightGray
+import by.slizh.cryptobankapp.ui.theme.Red
+import by.slizh.cryptobankapp.util.DateFormat
+import by.slizh.cryptobankapp.util.DoubleFormat
 
 @Composable
-fun ReplenishmentCard(onClick: () -> Unit) {
+fun ReplenishmentCard(transaction: Transaction) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = LightGray),
         modifier = Modifier
-            .fillMaxWidth(),
-        onClick = onClick
+            .fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
@@ -67,7 +70,7 @@ fun ReplenishmentCard(onClick: () -> Unit) {
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text = "11.02.2025",
+                    text = DateFormat.formatDate(transaction.date),
                     fontWeight = FontWeight.Medium,
                     fontSize = 14.sp,
                     lineHeight = 14.sp,
@@ -77,12 +80,16 @@ fun ReplenishmentCard(onClick: () -> Unit) {
             }
 
             Text(
-                text = "+152 \$",
+                text = "${if (transaction.profit >= 0) "+" else ""}${
+                    DoubleFormat.formatDouble(
+                        transaction.profit
+                    )
+                } $",
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
                 lineHeight = 18.sp,
                 letterSpacing = 0.sp,
-                color = Green
+                color = if (transaction.profit >= 0) Green else Red
             )
         }
     }
