@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.stringResource
@@ -35,6 +36,7 @@ import by.slizh.cryptobankapp.ui.theme.BlueClick
 import by.slizh.cryptobankapp.ui.theme.BlueDefault
 import by.slizh.cryptobankapp.ui.theme.Gray
 import by.slizh.cryptobankapp.ui.theme.LightGray
+import by.slizh.cryptobankapp.ui.theme.Red
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +48,7 @@ fun SetPriceBottomSheet(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var priceInput by remember { mutableStateOf("") }
+    var isError by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
         modifier = Modifier.fillMaxSize(),
@@ -60,6 +63,10 @@ fun SetPriceBottomSheet(
         ) {
             OutlinedTextField(
                 value = priceInput,
+                onValueChange = {
+                    priceInput = it
+                    isError = false
+                },
                 placeholder = {
                     Text(
                         text = stringResource(id = R.string.price),
@@ -70,7 +77,7 @@ fun SetPriceBottomSheet(
                         color = Gray
                     )
                 },
-                onValueChange = { priceInput = it },
+                isError = isError, // Подключаем ошибку
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -87,8 +94,8 @@ fun SetPriceBottomSheet(
                     unfocusedTextColor = DarkGray,
                     focusedContainerColor = LightGray,
                     unfocusedContainerColor = LightGray,
-                    focusedBorderColor = LightGray,
-                    unfocusedBorderColor = LightGray,
+                    focusedBorderColor =  LightGray,
+                    unfocusedBorderColor =  LightGray,
                     cursorColor = BlueDefault,
                     disabledContainerColor = LightGray.copy(alpha = 0.35f)
                 ),
@@ -105,11 +112,16 @@ fun SetPriceBottomSheet(
                 disabledContainerColor = BlueDefault.copy(alpha = 0.35f),
                 textColor = White,
                 modifier = Modifier.fillMaxWidth(),
+                enabled = true,
                 onClick = {
-                    onSetPrice(priceInput)
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            onDismiss()
+                    if (priceInput.isBlank()) {
+                        isError = true
+                    } else {
+                        onSetPrice(priceInput)
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                onDismiss()
+                            }
                         }
                     }
                 }

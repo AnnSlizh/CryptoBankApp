@@ -17,13 +17,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import by.slizh.cryptobankapp.Coin
+import by.slizh.cryptobankapp.domain.CoinEnum
 import by.slizh.cryptobankapp.ui.theme.Black
 import by.slizh.cryptobankapp.ui.theme.GrayClick
 import by.slizh.cryptobankapp.ui.theme.LightGray
 
 @Composable
-fun CoinCard(coin: Coin, onClick: () -> Unit) {
+fun CoinCard(coin: CoinEnum, onClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = LightGray, contentColor = GrayClick),

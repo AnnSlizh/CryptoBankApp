@@ -20,12 +20,14 @@ fun CustomButton(
     disabledContainerColor: Color,
     textColor: Color,
     modifier: Modifier = Modifier,
+    enabled: Boolean,
     onClick: () -> Unit
 ) {
     Button(
         modifier = modifier.height(51.dp),
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = contentColor,

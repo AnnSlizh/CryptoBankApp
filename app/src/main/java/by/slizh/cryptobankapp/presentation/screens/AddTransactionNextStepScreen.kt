@@ -14,6 +14,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,11 +27,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import by.slizh.cryptobankapp.Coin
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import by.slizh.cryptobankapp.R
 import by.slizh.cryptobankapp.presentation.components.AddTransactionTextField
 import by.slizh.cryptobankapp.presentation.components.CustomButton
 import by.slizh.cryptobankapp.presentation.components.SetPriceBottomSheet
+import by.slizh.cryptobankapp.presentation.viewModels.addTransaction.AddTransactionEvent
+import by.slizh.cryptobankapp.presentation.viewModels.addTransaction.AddTransactionViewModel
 import by.slizh.cryptobankapp.ui.theme.Black
 import by.slizh.cryptobankapp.ui.theme.BlueClick
 import by.slizh.cryptobankapp.ui.theme.BlueDefault
@@ -38,31 +43,38 @@ import by.slizh.cryptobankapp.ui.theme.GrayClick
 import by.slizh.cryptobankapp.ui.theme.LightGray
 
 @Composable
-fun AddTransactionNextStepScreen(modifier: Modifier = Modifier) {
+fun AddTransactionNextStepScreen(
+    navController: NavController,
+    coinName: String?,
+    addTransactionViewModel: AddTransactionViewModel = hiltViewModel()
+) {
 
-    var value by remember { mutableStateOf("") }
+    LaunchedEffect(coinName) {
+        if (coinName != null) {
+            addTransactionViewModel.onEvent(AddTransactionEvent.SelectCoin(coinName))
+        }
+    }
+
+    val state by addTransactionViewModel.state.collectAsState()
     var showBottomSheet by remember { mutableStateOf(false) }
-    var priceValue by remember { mutableStateOf("") }
 
     Column(
-        modifier = modifier
-            .padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 24.dp)
+        modifier = Modifier
+            .padding(16.dp)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(id = R.string.add_coin_transaction, Coin.BITCOIN.coinName),
+            text = stringResource(id = R.string.add_coin_transaction, state.coinName),
             fontWeight = FontWeight.Medium,
             fontSize = 20.sp,
-            lineHeight = 20.sp,
-            letterSpacing = 0.sp,
             color = Gray
         )
         Spacer(modifier = Modifier.height(117.dp))
 
         AddTransactionTextField(
-            value = value,
-            onValueChange = { value = it }
+            value = state.amount,
+            onValueChange = { addTransactionViewModel.onEvent(AddTransactionEvent.EnterAmount(it)) }
         )
         Spacer(modifier = Modifier.height(89.dp))
 
@@ -74,14 +86,12 @@ fun AddTransactionNextStepScreen(modifier: Modifier = Modifier) {
                 containerColor = LightGray,
                 contentColor = GrayClick
             ),
-            contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp)
+            contentPadding = PaddingValues(16.dp, 8.dp)
         ) {
             Text(
-                text = priceValue.ifEmpty { stringResource(id = R.string.price_coin) },
+                text = state.priceCoin.ifEmpty { stringResource(id = R.string.price_coin) },
                 fontWeight = FontWeight.Medium,
                 fontSize = 14.sp,
-                lineHeight = 14.sp,
-                letterSpacing = 0.sp,
                 color = Black
             )
         }
@@ -92,10 +102,11 @@ fun AddTransactionNextStepScreen(modifier: Modifier = Modifier) {
                 text = stringResource(id = R.string.cansel),
                 containerColor = LightGray,
                 contentColor = GrayClick,
-                disabledContainerColor = LightGray.copy(alpha = 0.35f),
                 textColor = BlueDefault,
                 modifier = Modifier.weight(1f),
-                onClick = {}
+                disabledContainerColor = LightGray.copy(alpha = 0.35f),
+                enabled = true,
+                onClick = { navController.popBackStack() }
             )
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -103,10 +114,15 @@ fun AddTransactionNextStepScreen(modifier: Modifier = Modifier) {
                 text = stringResource(id = R.string.add),
                 containerColor = BlueDefault,
                 contentColor = BlueClick,
-                disabledContainerColor = BlueDefault.copy(alpha = 0.35f),
                 textColor = Color.White,
                 modifier = Modifier.weight(1f),
-                onClick = {}
+                disabledContainerColor = BlueDefault.copy(alpha = 0.35f),
+                enabled = state.isButtonEnabled,
+                onClick = {
+                    addTransactionViewModel.onEvent(AddTransactionEvent.AddTransaction)
+                    navController.popBackStack()
+                }
+
             )
         }
 
@@ -114,7 +130,7 @@ fun AddTransactionNextStepScreen(modifier: Modifier = Modifier) {
             SetPriceBottomSheet(
                 onDismiss = { showBottomSheet = false },
                 onSetPrice = { newPrice ->
-                    priceValue = newPrice
+                    addTransactionViewModel.onEvent(AddTransactionEvent.EnterPrice(newPrice))
                     showBottomSheet = false
                 }
             )

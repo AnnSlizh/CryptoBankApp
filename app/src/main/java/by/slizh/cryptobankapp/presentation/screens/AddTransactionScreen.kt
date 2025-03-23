@@ -18,19 +18,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import by.slizh.cryptobankapp.Coin
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import by.slizh.cryptobankapp.domain.CoinEnum
 import by.slizh.cryptobankapp.R
 import by.slizh.cryptobankapp.presentation.components.CustomButton
 import by.slizh.cryptobankapp.presentation.components.cards.CoinCard
+import by.slizh.cryptobankapp.presentation.navigation.Screen
+import by.slizh.cryptobankapp.presentation.viewModels.addTransaction.AddTransactionEvent
+import by.slizh.cryptobankapp.presentation.viewModels.addTransaction.AddTransactionViewModel
 import by.slizh.cryptobankapp.ui.theme.BlueDefault
 import by.slizh.cryptobankapp.ui.theme.Gray
 import by.slizh.cryptobankapp.ui.theme.GrayClick
 import by.slizh.cryptobankapp.ui.theme.LightGray
 
 @Composable
-fun AddTransactionScreen(modifier: Modifier = Modifier) {
+fun AddTransactionScreen(
+    navController: NavController,
+    addTransactionViewModel: AddTransactionViewModel = hiltViewModel()
+) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 12.dp)
     ) {
@@ -52,10 +60,17 @@ fun AddTransactionScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(Coin.entries.toTypedArray()) { coin ->
+                items(CoinEnum.entries.toTypedArray()) { coin ->
                     CoinCard(
                         coin,
-                        onClick = { }
+                        onClick = {
+                            addTransactionViewModel.onEvent(AddTransactionEvent.SelectCoin(coin.coinName))
+                            navController.navigate(
+                                route = Screen.AddTransactionNextStepScreen.createRoute(
+                                    coinName = coin.coinName
+                                )
+                            )
+                        }
                     )
                 }
             }
@@ -69,7 +84,8 @@ fun AddTransactionScreen(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter),
-            onClick = {}
+            enabled = true,
+            onClick = { navController.popBackStack() }
         )
     }
 }
